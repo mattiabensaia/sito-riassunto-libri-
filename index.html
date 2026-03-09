@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sintesi Libri AI - Scopri i concetti chiave</title>
+    <meta name="description"
+        content="Inserisci il titolo di un libro e scopri immediatamente i suoi concetti principali generati con l'Intelligenza Artificiale.">
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Decorazioni Background (Glow Effects) -->
+        <div class="bg-glow circle-1"></div>
+        <div class="bg-glow circle-2"></div>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="logo-container">
+                    <div class="logo-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
+                        </svg>
+                    </div>
+                    <h1>Sintesi Libri <span class="accent-text">AI</span></h1>
+                </div>
+                <p class="subtitle">Estrai la saggezza da qualsiasi libro in pochi secondi.</p>
+            </header>
+
+            <section class="search-section">
+                <form id="searchForm" class="search-form">
+                    <div class="input-wrapper">
+                        <div class="search-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </div>
+                        <input type="text" id="bookInput" placeholder="Es. Il Signore degli Anelli, 1984, Sapiens..."
+                            required autocomplete="off">
+                        <button type="submit" id="searchButton" class="btn-primary">
+                            <span>Sintetizza</span>
+                            <div class="spinner hidden" id="loadingSpinner"></div>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Risultati della Ricerca -->
+            <section id="resultsArea" class="results-area hidden">
+                <div class="book-info">
+                    <h2 id="bookTitleDisplay">...</h2>
+                    <p class="book-meta">Ecco i concetti principali estratti dal libro.</p>
+                </div>
+
+                <div id="conceptsList" class="concepts-list">
+                    <!-- Concept Cards injected by JS -->
+                </div>
+            </section>
+
+            <!-- Stato di Errore -->
+            <section id="errorArea" class="error-area hidden">
+                <div class="error-card">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <p id="errorMessage">Si è verificato un errore durante la ricerca.</p>
+                </div>
+            </section>
+
+            <!-- Stato Vuoto (Iniziale) -->
+            <section id="emptyState" class="empty-state">
+                <div class="illustration-placeholder">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                        </path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                </div>
+                <h3>Pronto a imparare?</h3>
+                <p>Inserisci un titolo per iniziare. Potrai leggere i concetti chiave in modo chiaro e conciso.</p>
+            </section>
+
+            <!-- Bottone Impostazioni (API Key) -->
+            <button id="settingsBtn" class="settings-btn" title="Impostazioni API Key">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                    </path>
+                </svg>
+            </button>
+        </main>
+    </div>
+
+    <!-- Modale Impostazioni API Key -->
+    <div id="apiModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Configura l'Intelligenza Artificiale</h2>
+                <button class="close-btn" id="closeSettingsBtn">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <p class="instruction-text">
+                    Per funzionare realmente e generare i concetti dei libri, questa app utilizza il "cervello" di
+                    <strong>Google Gemini</strong>.
+                </p>
+
+                <div class="api-steps">
+                    <p><strong>Non hai una chiave API? È gratis in 1 minuto.</strong></p>
+                    <ol>
+                        <li>Vai su <a href="https://aistudio.google.com/app/apikey" target="_blank"
+                                rel="noopener noreferrer">Google AI Studio</a></li>
+                        <li>Accedi con il tuo account Google</li>
+                        <li>Clicca su <strong>"Create API Key"</strong></li>
+                        <li>Copia la lunga stringa di testo creata e incollala qui sotto.</li>
+                    </ol>
+                    <p class="security-note"><i>La chiave verrà salvata esclusivamente all'interno del tuo browser.
+                            Questa applicazione web non ha un server proprietario, quindi i tuoi dati rimangono
+                            completamente nel tuo computer.</i></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="apiKeyInput">La tua API Key Gemini:</label>
+                    <div class="input-actions-wrapper">
+                        <input type="password" id="apiKeyInput" placeholder="AIzaSyA..." autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button id="saveApiBtn" class="btn-primary" style="width: 100%; justify-content: center;">Salva e
+                        Inizia a Usare l'App</button>
+                    <p id="saveApiSuccess" class="success-message hidden">Chiave salvata! Ora puoi usare la ricerca
+                        vera.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logic -->
+    <script src="app.js"></script>
+</body>
+
+</html>
