@@ -1,6 +1,22 @@
 // app.js - Logica principale dell'applicazione Client-Side
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Intro Screen Logic
+    const welcomeScreen = document.getElementById('welcomeScreen');
+
+    // Controlla se la pagina è appena stata aperta. Possiamo mostrare l'intro sempre, 
+    // oppure usare sessionStorage per mostrarla solo la prima volta nella sessione.
+    // L'utente ha chiesto 'quando l'utente apre il sito', mostriamola sempre con un timer breve.
+    setTimeout(() => {
+        if (welcomeScreen) {
+            welcomeScreen.classList.add('fade-out');
+            // Rimuoviamo dal DOM per non bloccare scroll e click dopo l'animazione
+            setTimeout(() => {
+                welcomeScreen.remove();
+            }, 800); // tempo in sync con la transizione css (0.8s)
+        }
+    }, 2200); // Lasciamo il saluto per 2.2 secondi
+
     // Referenze UI Principali
     const searchForm = document.getElementById('searchForm');
     const bookInput = document.getElementById('bookInput');

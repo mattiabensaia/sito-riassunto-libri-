@@ -44,6 +44,55 @@ body {
   overflow-x: hidden;
 }
 
+/* Schermata di Benvenuto (Intro) */
+.welcome-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out;
+}
+
+.welcome-screen.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.welcome-content {
+  text-align: center;
+  animation: scaleUpFade 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.welcome-title {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+}
+
+.welcome-subtitle {
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  animation: fadeIn 1.5s ease-out 0.5s both;
+}
+
+@keyframes scaleUpFade {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* Background Decorations */
 .app-container {
   position: relative;
