@@ -51,7 +51,7 @@ La struttura del JSON deve essere ESATTAMENTE questa:
     }
   ]
 }
-Assicurati di creare massimo 4 branches, e per ogni branch massimo 3 nodes sintetici.`;
+Assicurati di creare massimo 5 branches, e per ogni branch massimo 4 nodes super-sintetici.`;
 
         const requestBody = {
             contents: [{ parts: [{ text: systemPrompt }] }],

@@ -412,13 +412,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // --- ENGINE VETTORIALE CANVAS ---
             const canvas = document.createElement('canvas');
-            canvas.width = 1920;
-            canvas.height = 1080;
+            // Aumentata risoluzione canvas per contenere fino a 5 rami x 4 foglie senza sovrapposizioni
+            canvas.width = 2400;
+            canvas.height = 1600;
             const ctx = canvas.getContext('2d');
 
             // Sfondo
             ctx.fillStyle = '#f8fafc';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Palette Colori Dinamica per i Vari Rami
+            const branchColors = ['#4f46e5', '#ec4899', '#0ea5e9', '#f59e0b', '#10b981'];
 
             // Font Utils
             const drawText = (text, x, y, size, weight, color, align = 'left') => {
@@ -428,84 +432,87 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillText(text, x, y);
             };
 
-            // Funzione Bolla con Testo "A-capo" grezzo
-            const drawBubble = (text, cx, cy, w, h, bgColor, textColor, radius = 12) => {
+            // Funzione Bolla con Testo
+            const drawBubble = (text, cx, cy, w, h, bgColor, textColor, radius = 12, strokeColor = null) => {
                 ctx.fillStyle = bgColor;
                 ctx.beginPath();
                 ctx.roundRect(cx - w / 2, cy - h / 2, w, h, radius);
                 ctx.fill();
 
-                // Ombretta leggerissima per look premium
-                ctx.shadowColor = 'rgba(0,0,0,0.1)';
-                ctx.shadowBlur = 10;
+                if (strokeColor) {
+                    ctx.strokeStyle = strokeColor;
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+
+                // Ombra leggera premium
+                ctx.shadowColor = 'rgba(0,0,0,0.08)';
+                ctx.shadowBlur = 12;
                 ctx.shadowOffsetY = 4;
                 ctx.fill();
                 ctx.shadowColor = 'transparent';
 
-                // Troncamento ultra grezzo se testo troppo lungo
-                let cleanText = text.length > 50 ? text.substring(0, 47) + '...' : text;
+                // Troncamento se testo troppo lungo
+                let cleanText = text.length > 55 ? text.substring(0, 52) + '...' : text;
                 drawText(cleanText, cx, cy + 6, h * 0.25, '600', textColor, 'center');
             };
 
             // Traccia connessione Bezier
-            const drawConnection = (startX, startY, endX, endY) => {
+            const drawConnection = (startX, startY, endX, endY, color = '#cbd5e1') => {
                 ctx.beginPath();
                 ctx.moveTo(startX, startY);
-                ctx.bezierCurveTo(startX + 100, startY, endX - 100, endY, endX, endY);
-                ctx.strokeStyle = '#cbd5e1';
+                ctx.bezierCurveTo(startX + 150, startY, endX - 150, endY, endX, endY);
+                ctx.strokeStyle = color;
                 ctx.lineWidth = 3;
                 ctx.stroke();
             };
 
             // 1) HEADER Documento
-            drawText("MAPPA CONCETTUALE", 40, 60, 24, '700', '#64748b');
-            drawText(`Libro: ${currentBookContext.title}`, 40, 100, 32, '700', '#0f172a');
-            drawText(`Autore: ${currentBookContext.author || 'N/D'}`, 40, 140, 20, '400', '#475569');
-            drawText("Generato tramite Sintesi Libri AI", 40, canvas.height - 40, 16, '400', '#94a3b8');
+            drawText("MAPPA CONCETTUALE", 50, 80, 28, '700', '#64748b');
+            drawText(`Libro: ${currentBookContext.title}`, 50, 130, 42, '700', '#0f172a');
+            drawText(`Autore: ${currentBookContext.author || 'N/D'}`, 50, 180, 24, '400', '#475569');
+            drawText("Generato tramite Sintesi Libri AI", 50, canvas.height - 50, 18, '400', '#94a3b8');
 
             // 2) Posizioni Logiche del Grafo
-            const rootX = 300;
-            const rootY = 540;
+            const rootX = 350;
+            const rootY = canvas.height / 2; // Centraggio vert
 
-            // ROOT NODE
-            drawBubble(mapData.root || 'Root', rootX, rootY, 350, 80, '#4f46e5', '#ffffff', 20);
+            // ROOT NODE (Nero)
+            drawBubble(mapData.root || 'Root', rootX, rootY, 400, 90, '#1e293b', '#ffffff', 20);
 
             // Disegna rami e foglie
             if (mapData.branches && mapData.branches.length > 0) {
                 const totalBranches = mapData.branches.length;
-                const branchX = 850;
+                const branchX = 1000;
 
-                // Spaziamo in Y in base a quanti ce ne sono
-                const branchStartY = 1080 / (totalBranches + 1);
+                // Spazio Y macro-ramo
+                const branchSpanY = (canvas.height - 150) / totalBranches;
 
                 mapData.branches.forEach((branch, bIdx) => {
-                    const branchY = branchStartY * (bIdx + 1);
+                    const branchY = 75 + (branchSpanY * bIdx) + (branchSpanY / 2);
+                    const bColor = branchColors[bIdx % branchColors.length];
 
                     // Linea Root -> Branch
-                    drawConnection(rootX + 175, rootY, branchX - 200, branchY);
+                    drawConnection(rootX + 200, rootY, branchX - 250, branchY, '#e2e8f0');
 
-                    // Bolla Branch
-                    drawBubble(branch.title || 'Tema', branchX, branchY, 400, 70, '#6366f1', '#ffffff', 16);
+                    // Bolla Branch Colorata
+                    drawBubble(branch.title || 'Tema', branchX, branchY, 450, 80, bColor, '#ffffff', 16);
 
                     // Disegna Nodi Finali
                     if (branch.nodes && branch.nodes.length > 0) {
                         const totalNodes = branch.nodes.length;
-                        const nodeX = 1500;
-                        const subSpan = 180; // pixel fra nodi di questo branch
+                        const nodeX = 1800;
+                        const nodeSpan = 100; // px di stacco tra fratelli
 
-                        // Centratura Y relativa al suo Branch
-                        const startNodeY = branchY - ((totalNodes - 1) * subSpan) / 2;
+                        // Centratura Y relativa al ramo
+                        const startNodeY = branchY - ((totalNodes - 1) * nodeSpan) / 2;
 
                         branch.nodes.forEach((nodeStr, nIdx) => {
-                            const nodeY = startNodeY + (nIdx * subSpan);
+                            const nodeY = startNodeY + (nIdx * nodeSpan);
 
-                            drawConnection(branchX + 200, branchY, nodeX - 250, nodeY);
-                            drawBubble(nodeStr, nodeX, nodeY, 500, 60, '#ffffff', '#1e293b', 12);
-
-                            // Aggiungo un bordino al node figlio perché è bianco su grigino
-                            ctx.strokeStyle = '#e2e8f0';
-                            ctx.lineWidth = 2;
-                            ctx.stroke();
+                            // Linea semi-trasparente col colore del ramo + bolla bordata
+                            drawConnection(branchX + 225, branchY, nodeX - 300, nodeY, bColor + '60');
+                            drawBubble(nodeStr, nodeX, nodeY, 600, 65, '#ffffff', '#0f172a', 12, bColor);
                         });
                     }
                 });
