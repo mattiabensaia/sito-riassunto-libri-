@@ -121,13 +121,20 @@
                     </button>
                 </div>
 
-                <!-- Schema Area (Inizialmente nascosta) -->
-                <div id="schemaArea" class="schema-area hidden">
-                    <div class="schema-header">
-                        <h3>Mappa Concettuale</h3>
+                <!-- Template Nascosto per Stampare il PDF Isolato della Mappa -->
+                <div id="printArea"
+                    style="position: absolute; left: -9999px; top: 0; width: 800px; padding: 40px; background: white; color: black; font-family: 'Inter', sans-serif;">
+                    <div
+                        style="text-align: center; border-bottom: 2px solid #ccc; margin-bottom: 30px; padding-bottom: 20px;">
+                        <h1 style="margin:0; font-size: 24px; color: #333;" id="printTitle">Titolo Libro</h1>
+                        <p style="margin:5px 0 0 0; color: #666; font-size: 16px;" id="printAuthor">Autore</p>
                     </div>
-                    <div id="schemaContent" class="schema-content">
-                        <!-- Content Markdown from AI -->
+                    <div id="printContent" style="font-size: 14px; line-height: 1.6; color: #222;">
+                        <!-- Contenuto Schema in Markdown verrà iniettato qui -->
+                    </div>
+                    <div
+                        style="margin-top: 50px; text-align: center; font-size: 12px; color: #999; border-top: 1px solid #eee; padding-top: 20px;">
+                        Generato tramite Sintesi Libri AI
                     </div>
                 </div>
 
