@@ -18,6 +18,72 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookTitleDisplay = document.getElementById('bookTitleDisplay');
     const conceptsList = document.getElementById('conceptsList');
 
+    // Drawer Cronologia
+    const historyBtn = document.getElementById('historyBtn');
+    const historyDrawer = document.getElementById('historyDrawer');
+    const closeHistoryBtn = document.getElementById('closeHistoryBtn');
+    const historyList = document.getElementById('historyList');
+    const emptyHistoryMsg = document.getElementById('emptyHistoryMsg');
+
+    // Array per memorizzare la history
+    let searchHistory = JSON.parse(localStorage.getItem('book_history') || '[]');
+
+    // --- FUNZIONALITA CRONOLOGIA ---
+    const updateHistoryUI = () => {
+        historyList.innerHTML = '';
+        if (searchHistory.length === 0) {
+            emptyHistoryMsg.classList.remove('hidden');
+        } else {
+            emptyHistoryMsg.classList.add('hidden');
+            // Ordine dall'ultimo salvato
+            [...searchHistory].reverse().forEach(bookData => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <h4>${bookData.title}</h4>
+                    <span>${bookData.timestamp || 'Recente'}</span>
+                `;
+                item.addEventListener('click', () => {
+                    historyDrawer.classList.add('hidden');
+                    renderResults(bookData);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+                historyList.appendChild(item);
+            });
+        }
+    };
+
+    const saveToHistory = (data) => {
+        // Evitiamo duplicati
+        const exists = searchHistory.findIndex(d => d.title === data.title);
+        if (exists !== -1) {
+            searchHistory.splice(exists, 1);
+        }
+        data.timestamp = new Date().toLocaleDateString('it-IT', { hour: '2-digit', minute: '2-digit' });
+        searchHistory.push(data);
+        // Manteniamo solo gli ultimi 15
+        if (searchHistory.length > 15) searchHistory.shift();
+
+        localStorage.setItem('book_history', JSON.stringify(searchHistory));
+        updateHistoryUI();
+    };
+
+    historyBtn?.addEventListener('click', () => {
+        updateHistoryUI();
+        historyDrawer.classList.remove('hidden');
+    });
+
+    closeHistoryBtn?.addEventListener('click', () => {
+        historyDrawer.classList.add('hidden');
+    });
+
+    historyDrawer?.addEventListener('click', (e) => {
+        if (e.target === historyDrawer) {
+            historyDrawer.classList.add('hidden');
+        }
+    });
+
+
     // --- INTEGRAZIONE CON IL BACKEND SERVERLESS (NETLIFY FUNCTION) ---
     const fetchBookSummaryFromServer = async (bookTitle) => {
         // Ora chiamiamo la nostra API "invisibile" sul server Netlify,
@@ -81,15 +147,42 @@ document.addEventListener('DOMContentLoaded', () => {
             // Stagger animation delay per animazione cascata elegante
             card.style.transitionDelay = `${index * 0.15}s`;
 
+            // L'AI ora ci restituisce anche una emoji relativa al concetto
+            const emoji = concept.emoji || (index + 1);
+
             card.innerHTML = `
+                <div class="concept-actions">
+                    <button class="copy-btn" title="Copia Appunti" data-text="${concept.description.replace(/"/g, '&quot;')}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                </div>
                 <div class="concept-header">
-                    <div class="concept-number">${index + 1}</div>
+                    <div class="concept-number">${emoji}</div>
                     <h3>${concept.title}</h3>
                 </div>
                 <p>${concept.description}</p>
             `;
 
+            // Aggiungi la card
             conceptsList.appendChild(card);
+
+            // Event Listener per il Copia Text
+            const copyBtn = card.querySelector('.copy-btn');
+            copyBtn.addEventListener('click', (e) => {
+                const t = e.currentTarget.getAttribute('data-text');
+                navigator.clipboard.writeText(t).then(() => {
+                    const originalHTML = copyBtn.innerHTML;
+                    copyBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+                    copyBtn.classList.add('copied');
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalHTML;
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                });
+            });
 
             // Trigger reflow per avviare l'animazione d'ingresso
             setTimeout(() => {
@@ -123,6 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await fetchBookSummaryFromServer(title);
             hideLoading();
             renderResults(data);
+            saveToHistory(data); // Salva nella cronologia dopo il successo
         } catch (err) {
             hideLoading();
             showError(err);

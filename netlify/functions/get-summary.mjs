@@ -54,6 +54,7 @@ Devi restituire i risultati UNICAMENTE in formato JSON testuale, seguendo perfet
   "title": "Titolo completo del libro e autore se lo conosci",
   "concepts": [
     {
+      "emoji": "Una singola emoji molto descrittiva che rappresenta e descrive il concetto senza testo (es. 🚀, 🧠, 💡)",
       "title": "Titolo breve del concetto...",
       "description": "Una spiegazione in 3-4 frasi chiare e scorrevoli."
     }

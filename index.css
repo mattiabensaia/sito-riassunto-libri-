@@ -109,7 +109,34 @@ body {
 /* Header */
 .header {
   text-align: center;
+  position: relative;
   animation: slideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.header-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.action-btn {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-normal);
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--accent-primary);
+  transform: translateY(-2px);
 }
 
 .logo-container {
@@ -359,6 +386,42 @@ input::placeholder {
   transform: translateY(0);
 }
 
+.concept-actions {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.concept-card:hover .concept-actions {
+  opacity: 1;
+}
+
+.copy-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.copy-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.copy-btn.copied {
+  color: #10b981;
+  border-color: #10b981;
+}
+
 .concept-card::before {
   content: '';
   position: absolute;
@@ -392,13 +455,18 @@ input::placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
+  width: 44px;
+  /* Increased from 36px */
+  height: 44px;
+  /* Increased from 36px */
   background: rgba(99, 102, 241, 0.1);
-  color: var(--accent-primary);
+  color: #fff;
   border-radius: 50%;
-  font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 1.4rem;
+  /* Increased from 1.2rem */
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
 }
 
 .concept-card h3 {
@@ -497,4 +565,3 @@ input::placeholder {
     padding: 1.5rem;
   }
 }
-

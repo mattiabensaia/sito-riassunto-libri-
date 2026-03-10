@@ -25,6 +25,14 @@
 
         <main class="main-content">
             <header class="header">
+                <div class="header-actions">
+                    <button id="historyBtn" class="action-btn" title="Libreria (Cronologia)">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
+                        </svg>
+                    </button>
+                </div>
                 <div class="logo-container">
                     <div class="logo-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -101,6 +109,24 @@
 
         </main>
     </div>
+
+    <!-- Modale Cronologia (Drawer) -->
+    <div id="historyDrawer" class="drawer-overlay hidden">
+        <div class="drawer-content">
+            <div class="drawer-header">
+                <h2>La Tua Libreria</h2>
+                <button class="close-btn" id="closeHistoryBtn">&times;</button>
+            </div>
+            <div class="drawer-body">
+                <p id="emptyHistoryMsg" class="instruction-text">Nessun libro salvato ancora. Cerca un libro per
+                    aggiungerlo alla tua libreria!</p>
+                <div id="historyList" class="history-list">
+                    <!-- Gli elementi della cronologia verranno iniettati qui da JS -->
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="app.js"></script>
 </body>
+
 </html>
