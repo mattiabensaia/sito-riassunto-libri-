@@ -405,25 +405,32 @@ document.addEventListener('DOMContentLoaded', () => {
             printAuthor.textContent = currentBookContext.author || '';
             printContent.innerHTML = formattedHtml;
 
-            generateSchemaBtn.querySelector('span').textContent = 'Download in corso...';
+            generateSchemaBtn.querySelector('span').textContent = 'Preparazione PDF...';
 
             // Diamo tempo al DOM nascosto di iniettare i test prima di convertirli
             setTimeout(() => {
                 const title = currentBookContext?.title || 'Libro';
                 const sanitizedTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
+                // Esponiamo l'area al dom per il canvas
+                document.body.classList.add('is-printing');
+
                 const opt = {
                     margin: 15, // Margine spazioso da vero documento testuale
                     filename: `${sanitizedTitle}_mappa.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2 }, // Niente useCORS perché non c'è più la copertina
+                    html2canvas: { scale: 2 }, // Niente useCORS perché non c'è più la copertina esterna
                     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
                 };
 
                 html2pdf().set(opt).from(printArea).save().then(() => {
-                    generateSchemaBtn.querySelector('span').textContent = 'Scarica di nuovo';
+                    document.body.classList.remove('is-printing');
+                    generateSchemaBtn.querySelector('span').textContent = 'Mappa Concettuale';
                     schemaSpinner.classList.add('hidden');
                     generateSchemaBtn.disabled = false;
+                }).catch(err => {
+                    document.body.classList.remove('is-printing');
+                    console.error("Errore salvataggio PDF", err);
                 });
             }, 300); // tempo di rendering per l'HTML
 

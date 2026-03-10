@@ -584,6 +584,99 @@ input::placeholder {
   margin-bottom: 0.5rem;
 }
 
+/* --- Print Area (Per html2pdf) --- */
+.print-area {
+  background-color: #ffffff;
+  color: #000000;
+  padding: 40px;
+  width: 800px;
+  /* Layout rigido per l'A4 */
+  min-height: 1122px;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+  /* Posizionato sopra ma invisibile per html2canvas */
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -100;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Quando vogliamo stamparlo davvero, forziamo visibilità bloccando temporaneamente lo schermo */
+body.is-printing .print-area {
+  z-index: 99999 !important;
+  opacity: 1 !important;
+}
+
+/* Nascondiamo temporaneamente TUTTO IL SITO ECCETTO il print-area per far scattare la foto a html2canvas in pace */
+body.is-printing .app-container>*:not(.print-area) {
+  display: none !important;
+}
+
+.print-header {
+  text-align: center;
+  border-bottom: 2px solid #ccc;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+}
+
+.print-header h1 {
+  margin: 0;
+  font-size: 32px;
+  color: #111;
+}
+
+.print-header p {
+  margin: 8px 0 0 0;
+  color: #555;
+  font-size: 18px;
+}
+
+.print-content {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #222;
+}
+
+.print-content ul {
+  padding-left: 20px;
+  margin-bottom: 15px;
+}
+
+.print-content li {
+  margin-bottom: 8px;
+}
+
+.print-content h2 {
+  font-size: 22px;
+  color: #000;
+  margin-top: 30px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+.print-content h3 {
+  font-size: 18px;
+  color: #333;
+  margin-top: 20px;
+}
+
+.print-content strong {
+  color: #000;
+  font-weight: 700;
+}
+
+.print-footer {
+  margin-top: 60px;
+  text-align: center;
+  font-size: 14px;
+  color: #888;
+  border-top: 1px solid #ddd;
+  padding-top: 20px;
+}
+
 /* Titolo Sezioni Intermedie */
 .section-title {
   display: flex;
@@ -916,52 +1009,7 @@ input::placeholder {
   }
 }
 
-/* Layout per Esportazione PDF (Usato da html2pdf) */
-.pdf-export-mode {
-  background: #fff !important;
-  color: #000 !important;
-  padding: 20px !important;
-}
-
-.pdf-export-mode * {
-  color: #000 !important;
-  border-color: #ddd !important;
-}
-
-.pdf-export-mode .no-print,
-.pdf-export-mode .concept-actions,
-.pdf-export-mode .action-toolbar,
-.pdf-export-mode .chat-section {
-  display: none !important;
-}
-
-.pdf-export-mode .book-hero-card,
-.pdf-export-mode .concept-card,
-.pdf-export-mode .schema-area {
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: none !important;
-  border: 1px solid #ccc !important;
-  color: #000 !important;
-}
-
-.pdf-export-mode .book-summary-box p,
-.pdf-export-mode .book-characters-box li,
-.pdf-export-mode .schema-content {
-  color: #333 !important;
-}
-
-.pdf-export-mode .accent-text,
-.pdf-export-mode .book-info-header .book-meta,
-.pdf-export-mode .schema-header h3 {
-  color: #4f46e5 !important;
-}
-
-.pdf-export-mode .concept-number {
-  background: rgba(99, 102, 241, 0.1) !important;
-  box-shadow: none !important;
-}
+/* Layout Esportazione Rimosso - Sostituito da PrintArea dedicata */
 
 /* History Drawer Overlay & Modal */
 .drawer-overlay {
