@@ -98,66 +98,9 @@
                 <p>Inserisci un titolo per iniziare. Potrai leggere i concetti chiave in modo chiaro e conciso.</p>
             </section>
 
-            <!-- Bottone Impostazioni (API Key) -->
-            <button id="settingsBtn" class="settings-btn" title="Impostazioni API Key">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path
-                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
-                    </path>
-                </svg>
-            </button>
+
         </main>
     </div>
-
-    <!-- Modale Impostazioni API Key -->
-    <div id="apiModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Configura l'Intelligenza Artificiale</h2>
-                <button class="close-btn" id="closeSettingsBtn">&times;</button>
-            </div>
-
-            <div class="modal-body">
-                <p class="instruction-text">
-                    Per funzionare realmente e generare i concetti dei libri, questa app utilizza il "cervello" di
-                    <strong>Google Gemini</strong>.
-                </p>
-
-                <div class="api-steps">
-                    <p><strong>Non hai una chiave API? È gratis in 1 minuto.</strong></p>
-                    <ol>
-                        <li>Vai su <a href="https://aistudio.google.com/app/apikey" target="_blank"
-                                rel="noopener noreferrer">Google AI Studio</a></li>
-                        <li>Accedi con il tuo account Google</li>
-                        <li>Clicca su <strong>"Create API Key"</strong></li>
-                        <li>Copia la lunga stringa di testo creata e incollala qui sotto.</li>
-                    </ol>
-                    <p class="security-note"><i>La chiave verrà salvata esclusivamente all'interno del tuo browser.
-                            Questa applicazione web non ha un server proprietario, quindi i tuoi dati rimangono
-                            completamente nel tuo computer.</i></p>
-                </div>
-
-                <div class="form-group">
-                    <label for="apiKeyInput">La tua API Key Gemini:</label>
-                    <div class="input-actions-wrapper">
-                        <input type="password" id="apiKeyInput" placeholder="AIzaSyA..." autocomplete="off">
-                    </div>
-                </div>
-
-                <div class="modal-actions">
-                    <button id="saveApiBtn" class="btn-primary" style="width: 100%; justify-content: center;">Salva e
-                        Inizia a Usare l'App</button>
-                    <p id="saveApiSuccess" class="success-message hidden">Chiave salvata! Ora puoi usare la ricerca
-                        vera.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Logic -->
     <script src="app.js"></script>
 </body>
-
 </html>
