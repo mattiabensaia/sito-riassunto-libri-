@@ -584,97 +584,81 @@ input::placeholder {
   margin-bottom: 0.5rem;
 }
 
-/* --- Print Area (Per html2pdf) --- */
+/* --- Print Area (Per window.print) --- */
 .print-area {
-  background-color: #ffffff;
-  color: #000000;
-  padding: 40px;
-  width: 800px;
-  /* Layout rigido per l'A4 */
-  min-height: 1122px;
-  box-sizing: border-box;
-  font-family: 'Inter', sans-serif;
-  /* Posizionato sopra ma invisibile per html2canvas */
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: -100;
-  opacity: 0;
-  pointer-events: none;
+  display: none;
+  /* Nascosto sul sito normale */
 }
 
-/* Quando vogliamo stamparlo davvero, forziamo visibilità bloccando temporaneamente lo schermo */
-body.is-printing .print-area {
-  z-index: 99999 !important;
-  opacity: 1 !important;
-}
+/* Quando l'utente stampa (window.print), mostriamo solo print-area */
+@media print {
+  body * {
+    visibility: hidden;
+  }
 
-/* Nascondiamo temporaneamente TUTTO IL SITO ECCETTO il print-area per far scattare la foto a html2canvas in pace */
-body.is-printing .app-container>*:not(.print-area) {
-  display: none !important;
-}
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
 
-.print-header {
-  text-align: center;
-  border-bottom: 2px solid #ccc;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
-}
+  .print-area {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 20px;
+    background-color: white;
+    color: black;
+  }
 
-.print-header h1 {
-  margin: 0;
-  font-size: 32px;
-  color: #111;
-}
+  /* Nascondi il contenitore principale fittizio */
+  .app-container {
+    display: none;
+  }
 
-.print-header p {
-  margin: 8px 0 0 0;
-  color: #555;
-  font-size: 18px;
-}
+  .print-header {
+    text-align: center;
+    border-bottom: 2px solid #ccc;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+  }
 
-.print-content {
-  font-size: 16px;
-  line-height: 1.8;
-  color: #222;
-}
+  .print-header h1 {
+    font-size: 24pt;
+    margin: 0;
+  }
 
-.print-content ul {
-  padding-left: 20px;
-  margin-bottom: 15px;
-}
+  .print-header p {
+    font-size: 14pt;
+    color: #555;
+    margin-top: 5px;
+  }
 
-.print-content li {
-  margin-bottom: 8px;
-}
+  .print-content {
+    font-size: 12pt;
+    line-height: 1.6;
+  }
 
-.print-content h2 {
-  font-size: 22px;
-  color: #000;
-  margin-top: 30px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 5px;
-}
+  .print-content h2 {
+    font-size: 18pt;
+    margin-top: 20px;
+    border-bottom: 1px solid #eee;
+  }
 
-.print-content h3 {
-  font-size: 18px;
-  color: #333;
-  margin-top: 20px;
-}
+  .print-content h3 {
+    font-size: 14pt;
+    margin-top: 15px;
+  }
 
-.print-content strong {
-  color: #000;
-  font-weight: 700;
-}
-
-.print-footer {
-  margin-top: 60px;
-  text-align: center;
-  font-size: 14px;
-  color: #888;
-  border-top: 1px solid #ddd;
-  padding-top: 20px;
+  .print-footer {
+    text-align: center;
+    font-size: 10pt;
+    color: #888;
+    margin-top: 40px;
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+  }
 }
 
 /* Titolo Sezioni Intermedie */

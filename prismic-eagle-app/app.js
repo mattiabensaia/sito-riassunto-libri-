@@ -180,19 +180,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fetchCoverImage = async (title, author) => {
         try {
-            // Cerchiamo l'ID del libro openlibrary
-            const response = await fetch(`https://openlibrary.org/search.json?title=${encodeURIComponent(title)}&author=${encodeURIComponent(author)}&limit=1`);
-            const data = await response.json();
+            // Tentativo 1: Cerchiamo l'ID del libro openlibrary
+            const olResponse = await fetch(`https://openlibrary.org/search.json?title=${encodeURIComponent(title)}&author=${encodeURIComponent(author)}&limit=1`);
+            const olData = await olResponse.json();
 
-            if (data.docs && data.docs.length > 0 && data.docs[0].cover_i) {
-                const coverId = data.docs[0].cover_i;
+            if (olData.docs && olData.docs.length > 0 && olData.docs[0].cover_i) {
+                const coverId = olData.docs[0].cover_i;
                 bookCoverImg.src = `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`;
-            } else {
-                // Fallback a copertina testuale pulita
-                bookCoverImg.src = `https://via.placeholder.com/300x450/1a1a24/6366f1?text=${encodeURIComponent(title.split(' ').slice(0, 3).join(' '))}`;
+                return;
             }
+
+            // Tentativo 2 (Fallback): Google Books API se OpenLibrary non ha l'immagine
+            const gbResponse = await fetch(`https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(title)}+inauthor:${encodeURIComponent(author)}&maxResults=1`);
+            const gbData = await gbResponse.json();
+
+            if (gbData.items && gbData.items.length > 0 && gbData.items[0].volumeInfo.imageLinks) {
+                // Usiamo thumbnail (spesso l'unica disponibile su GB), rimpiazziamo zoom per qualità migliore se possibile
+                let coverUrl = gbData.items[0].volumeInfo.imageLinks.thumbnail;
+                coverUrl = coverUrl.replace('http:', 'https:').replace('&zoom=1', '&zoom=0');
+                bookCoverImg.src = coverUrl;
+                return;
+            }
+
+            throw new Error("Nessuna immagine trovata nelle API pubbliche");
+
         } catch (error) {
-            console.error("OpenLibrary fallita", error);
+            console.warn("Fallback copertina testuale attivato", error);
+            // Fallback finale a copertina testuale pulita e colorata
+            bookCoverImg.src = `https://via.placeholder.com/300x450/1a1a24/6366f1?text=${encodeURIComponent(title.split(' ').slice(0, 3).join(' '))}`;
         }
     };
 
@@ -400,39 +415,27 @@ document.addEventListener('DOMContentLoaded', () => {
             formattedHtml = formattedHtml.replace(/^\* (.*$)/gim, '<ul><li style="margin-bottom: 6px;">$1</li></ul>');
             formattedHtml = formattedHtml.replace(/<\/ul>\n<ul>/gim, '');
 
-            // Popola il div bianco formale invisibile che non fa parte del layout visuale
+            // Popola il div bianco formale strutturato
             printTitle.textContent = currentBookContext.title;
             printAuthor.textContent = currentBookContext.author || '';
             printContent.innerHTML = formattedHtml;
 
-            generateSchemaBtn.querySelector('span').textContent = 'Preparazione PDF...';
-
-            // Diamo tempo al DOM nascosto di iniettare i test prima di convertirli
+            // Diamo tempo al DOM di iniettare l'HTML prima di stampare
             setTimeout(() => {
-                const title = currentBookContext?.title || 'Libro';
-                const sanitizedTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                // Rinominiamo solo temporaneamente il titolo pagina così che il file salvato da browser abbia un nome bello
+                const originalPageTitle = document.title;
+                const sanitizedTitle = (currentBookContext?.title || 'Libro').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                document.title = `${sanitizedTitle}_mappa_concettuale`;
 
-                // Esponiamo l'area al dom per il canvas
-                document.body.classList.add('is-printing');
+                // Attiviamo stampa nativa
+                window.print();
 
-                const opt = {
-                    margin: 15, // Margine spazioso da vero documento testuale
-                    filename: `${sanitizedTitle}_mappa.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2 }, // Niente useCORS perché non c'è più la copertina esterna
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
-
-                html2pdf().set(opt).from(printArea).save().then(() => {
-                    document.body.classList.remove('is-printing');
-                    generateSchemaBtn.querySelector('span').textContent = 'Mappa Concettuale';
-                    schemaSpinner.classList.add('hidden');
-                    generateSchemaBtn.disabled = false;
-                }).catch(err => {
-                    document.body.classList.remove('is-printing');
-                    console.error("Errore salvataggio PDF", err);
-                });
-            }, 300); // tempo di rendering per l'HTML
+                // Ripristiniamo UI e titolo originale
+                document.title = originalPageTitle;
+                generateSchemaBtn.querySelector('span').textContent = 'Scarica di nuovo';
+                schemaSpinner.classList.add('hidden');
+                generateSchemaBtn.disabled = false;
+            }, 500);
 
         } catch (err) {
             console.error("Errore Mappa Concettuale", err);
