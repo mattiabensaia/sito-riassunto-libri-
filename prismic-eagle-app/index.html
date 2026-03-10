@@ -67,13 +67,58 @@
 
             <!-- Risultati della Ricerca -->
             <section id="resultsArea" class="results-area hidden">
-                <div class="book-info">
-                    <h2 id="bookTitleDisplay">...</h2>
-                    <p class="book-meta">Ecco i concetti principali estratti dal libro.</p>
+                <!-- Nuova Hero Card del Libro -->
+                <div class="book-hero-card">
+                    <div class="book-cover-wrapper">
+                        <img id="bookCoverImg" src="" alt="Copertina Libro" class="book-cover skeleton-pulse"
+                            onerror="this.src='https://via.placeholder.com/300x450/1a1a24/6366f1?text=N/D'">
+                    </div>
+                    <div class="book-details">
+                        <div class="book-info-header">
+                            <h2 id="bookTitleDisplay">...</h2>
+                            <p id="bookAuthorYear" class="book-meta">...</p>
+                        </div>
+                        <div class="book-summary-box">
+                            <h4>La Trama</h4>
+                            <p id="bookSummaryText">...</p>
+                        </div>
+                        <div class="book-characters-box">
+                            <h4>Personaggi Principali</h4>
+                            <ul id="bookCharactersList">
+                                <!-- Li elementi iniettati da JS -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <h3>I 4 Concetti Chiave</h3>
                 </div>
 
                 <div id="conceptsList" class="concepts-list">
                     <!-- Concept Cards injected by JS -->
+                </div>
+
+                <!-- Sezione Chat AI -->
+                <div class="chat-section">
+                    <div class="chat-header">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        <h3>Chiedi a Gemini</h3>
+                    </div>
+                    <div id="chatHistory" class="chat-history">
+                        <!-- Messaggi Chat iniettati da JS -->
+                    </div>
+                    <form id="chatForm" class="chat-form">
+                        <input type="text" id="chatInput" placeholder="Es. Cosa succede ad Harry alla fine?" required
+                            autocomplete="off">
+                        <button type="submit" id="chatButton" class="btn-primary btn-chat">
+                            <span>Invia</span>
+                            <div class="spinner hidden" id="chatSpinner"></div>
+                        </button>
+                    </form>
                 </div>
             </section>
 

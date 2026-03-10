@@ -48,19 +48,28 @@ export const handler = async (event, context) => {
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
 
         const systemPrompt = `Sei un esperto di letteratura e di sintesi concettuale. 
-Il tuo compito è analizzare il libro "${bookTitle}" e restituire ESATTAMENTE 4 concetti chiave essenziali espressi in quel libro.
+Il tuo compito è analizzare il libro "${bookTitle}" e restituire informazioni dettagliate ed ESATTAMENTE 4 concetti chiave essenziali.
 Devi restituire i risultati UNICAMENTE in formato JSON testuale, seguendo perfettamente questa struttura:
 {
-  "title": "Titolo completo del libro e autore se lo conosci",
+  "title": "Titolo completo del libro (italiano)",
+  "author": "Nome e Cognome dell'autore principale",
+  "year": "Anno della prima pubblicazione (es. 1954)",
+  "summary": "Un riassunto molto avvincente ed estremamente scorrevole della trama generale o del senso dell'opera della lunghezza di 3 o 4 frasi.",
+  "characters": [
+    {
+      "name": "Nome del personaggio o Protagonista",
+      "role": "Una riga che descrive chi è o cosa fa"
+    }
+  ],
   "concepts": [
     {
-      "emoji": "Una singola emoji molto descrittiva che rappresenta e descrive il concetto senza testo (es. 🚀, 🧠, 💡)",
+      "emoji": "Una singola emoji molto descrittiva che rappresenta e descrive il concetto (es. 🚀, 🧠, 💡)",
       "title": "Titolo breve del concetto...",
-      "description": "Una spiegazione in 3-4 frasi chiare e scorrevoli."
+      "description": "Una spiegazione in 3-4 frasi chiare e scorrevoli sul perché questo è un concetto chiave del libro."
     }
   ]
 }
-IMPORTANTE: Restituisci SOLO l'oggetto JSON, senza tag markdown \`\`\`json e senza null'altro.`;
+IMPORTANTE: I characters (protagonisti/personaggi) devono essere massimo 3 o 4. I concepts (concetti chiave) devono essere ESATTAMENTE 4. Restituisci SOLO l'oggetto JSON, senza tag markdown \`\`\`json e senza null'altro.`;
 
         const requestBody = {
             contents: [{ parts: [{ text: systemPrompt }] }],

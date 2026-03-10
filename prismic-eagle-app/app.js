@@ -14,9 +14,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorArea = document.getElementById('errorArea');
     const errorMessageDisplay = document.getElementById('errorMessage');
 
-    // Area rendering risultati
+    // Area rendering risultati principale
+    const bookCoverImg = document.getElementById('bookCoverImg');
     const bookTitleDisplay = document.getElementById('bookTitleDisplay');
+    const bookAuthorYear = document.getElementById('bookAuthorYear');
+    const bookSummaryText = document.getElementById('bookSummaryText');
+    const bookCharactersList = document.getElementById('bookCharactersList');
     const conceptsList = document.getElementById('conceptsList');
+
+    // Area Chat AI
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const chatButton = document.getElementById('chatButton');
+    const chatSpinner = document.getElementById('chatSpinner');
+    const chatHistory = document.getElementById('chatHistory');
+
+    // Variabile per mantenere il contesto globale del libro visionato
+    let currentBookContext = null;
 
     // Drawer Cronologia
     const historyBtn = document.getElementById('historyBtn');
@@ -134,12 +148,57 @@ document.addEventListener('DOMContentLoaded', () => {
         searchButton.disabled = false;
     };
 
+    const fetchCoverImage = async (title, author) => {
+        try {
+            // Cerchiamo l'ID del libro openlibrary
+            const response = await fetch(`https://openlibrary.org/search.json?title=${encodeURIComponent(title)}&author=${encodeURIComponent(author)}&limit=1`);
+            const data = await response.json();
+
+            if (data.docs && data.docs.length > 0 && data.docs[0].cover_i) {
+                const coverId = data.docs[0].cover_i;
+                bookCoverImg.src = `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`;
+            } else {
+                // Fallback a copertina testuale pulita
+                bookCoverImg.src = `https://via.placeholder.com/300x450/1a1a24/6366f1?text=${encodeURIComponent(title.split(' ').slice(0, 3).join(' '))}`;
+            }
+        } catch (error) {
+            console.error("OpenLibrary fallita", error);
+        }
+    };
+
     const renderResults = (data) => {
         if (!data.title || !data.concepts || !Array.isArray(data.concepts)) {
             throw new Error("Formato risposta del Server non valido.");
         }
 
+        // Memorizzo i dati per farli usare in seguito alla CHAT
+        currentBookContext = data;
+
+        // Reset copertina
+        bookCoverImg.src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='; // Reset veloce
+
+        // Popola Info Principali (Hero Card)
         bookTitleDisplay.textContent = data.title;
+        bookAuthorYear.textContent = `${data.author || 'Autore Sconosciuto'} • ${data.year || 'N/D'}`;
+        bookSummaryText.textContent = data.summary || '';
+
+        // Popola Personaggi
+        bookCharactersList.innerHTML = '';
+        if (data.characters && data.characters.length > 0) {
+            data.characters.forEach(char => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${char.name}</strong> - ${char.role}`;
+                bookCharactersList.appendChild(li);
+            });
+        }
+
+        // Avvio fetch silenziosa della Cover
+        if (data.title && data.author) {
+            fetchCoverImage(data.title, data.author);
+        }
+
+        // Reset vecchi concetti
+        conceptsList.innerHTML = '';
 
         data.concepts.forEach((concept, index) => {
             const card = document.createElement('div');
@@ -203,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
         errorArea.classList.remove('hidden');
     };
 
-    // --- EVENT LISTENER RICERCA ---
+    // --- EVENT LISTENER RICERCA PRINCIPALE ---
     searchForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -211,6 +270,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!title) return;
 
         showLoading();
+
+        // Azzera la chat del modello precedente
+        chatHistory.innerHTML = '';
+        chatInput.value = '';
 
         try {
             const data = await fetchBookSummaryFromServer(title);
@@ -222,5 +285,60 @@ document.addEventListener('DOMContentLoaded', () => {
             showError(err);
         }
     });
+
+    // --- EVENT LISTENER CHAT CON L'AI ---
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const question = chatInput.value.trim();
+        if (!question || !currentBookContext) return;
+
+        // Aggiungi subito la bolla di risposta dell'Utente
+        appendChatMessage(question, 'user');
+        chatInput.value = '';
+
+        // UI Caricamento Bottone Chat
+        const originalBtnText = chatButton.querySelector('span').textContent;
+        chatButton.querySelector('span').textContent = '...';
+        chatSpinner.classList.remove('hidden');
+        chatButton.disabled = true;
+
+        try {
+            const response = await fetch('/.netlify/functions/ask-question', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: question,
+                    bookTitle: currentBookContext.title,
+                    author: currentBookContext.author
+                })
+            });
+
+            const replyData = await response.json();
+
+            if (!response.ok) {
+                throw new Error("Errore Chat Server");
+            }
+
+            appendChatMessage(replyData.answer, 'bot');
+
+        } catch (err) {
+            console.error("Errore Chat", err);
+            appendChatMessage("Scusa, ho avuto un problema tecnico nel recuperare la risposta. Riprova.", 'bot');
+        } finally {
+            // Restore btn
+            chatButton.querySelector('span').textContent = originalBtnText;
+            chatSpinner.classList.add('hidden');
+            chatButton.disabled = false;
+        }
+    });
+
+    const appendChatMessage = (text, senderType) => {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `chat-bubble ${senderType}-bubble animate-in`;
+        msgDiv.textContent = text;
+        chatHistory.appendChild(msgDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight; // Autoscroll al nuovo msg
+    };
 
 });
