@@ -116,19 +116,7 @@
                     </button>
                 </div>
 
-                <!-- Template per Stampare il PDF (Invisibile sul sito, visibile solo in export) -->
-                <div id="printArea" class="print-area hidden">
-                    <div class="print-header">
-                        <h1 id="printTitle">Titolo Libro</h1>
-                        <p id="printAuthor">Autore</p>
-                    </div>
-                    <div id="printContent" class="print-content">
-                        <!-- Contenuto Schema in Markdown -->
-                    </div>
-                    <div class="print-footer">
-                        Generato tramite Sintesi Libri AI
-                    </div>
-                </div>
+
 
                 <div class="section-title">
                     <h3>I 4 Concetti Chiave</h3>
@@ -210,6 +198,21 @@
             </div>
         </div>
     </div>
+
+    <!-- Template per Stampare il PDF (Invisibile sul sito, indipendente) -->
+    <div id="printArea" class="print-area">
+        <div class="print-header">
+            <h1 id="printTitle">Titolo Libro</h1>
+            <p id="printAuthor">Autore</p>
+        </div>
+        <div id="printContent" class="print-content">
+            <!-- Contenuto Schema in Markdown -->
+        </div>
+        <div class="print-footer">
+            Generato tramite Sintesi Libri AI
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 

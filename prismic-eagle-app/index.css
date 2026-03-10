@@ -592,29 +592,23 @@ input::placeholder {
 
 /* Quando l'utente stampa (window.print), mostriamo solo print-area */
 @media print {
-  body * {
-    visibility: hidden;
+
+  /* Nascondi layout principale, modal e overlay */
+  .app-container,
+  .welcome-screen,
+  .drawer-overlay {
+    display: none !important;
   }
 
-  .print-area,
-  .print-area * {
-    visibility: visible;
-  }
-
+  /* Rendi visibile l'area di stampa in modo pulito */
   .print-area {
-    display: block;
-    position: absolute;
-    left: 0;
-    top: 0;
+    display: block !important;
+    position: relative;
     width: 100%;
-    padding: 20px;
+    padding: 0;
+    margin: 0;
     background-color: white;
     color: black;
-  }
-
-  /* Nascondi il contenitore principale fittizio */
-  .app-container {
-    display: none;
   }
 
   .print-header {
