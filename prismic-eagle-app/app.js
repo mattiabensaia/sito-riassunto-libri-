@@ -38,6 +38,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookCharactersList = document.getElementById('bookCharactersList');
     const conceptsList = document.getElementById('conceptsList');
 
+    // Area Azioni (PDF e Schema)
+    const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+    const generateSchemaBtn = document.getElementById('generateSchemaBtn');
+    const schemaSpinner = document.getElementById('schemaSpinner');
+    const schemaArea = document.getElementById('schemaArea');
+    const schemaContent = document.getElementById('schemaContent');
+
     // Area Chat AI
     const chatForm = document.getElementById('chatForm');
     const chatInput = document.getElementById('chatInput');
@@ -164,6 +171,13 @@ document.addEventListener('DOMContentLoaded', () => {
         searchButton.disabled = false;
     };
 
+    const resetSchemaArea = () => {
+        schemaArea.classList.add('hidden');
+        schemaContent.innerHTML = '';
+        generateSchemaBtn.disabled = false;
+        generateSchemaBtn.querySelector('span').textContent = 'Genera Appunti';
+    };
+
     const fetchCoverImage = async (title, author) => {
         try {
             // Cerchiamo l'ID del libro openlibrary
@@ -213,8 +227,9 @@ document.addEventListener('DOMContentLoaded', () => {
             fetchCoverImage(data.title, data.author);
         }
 
-        // Reset vecchi concetti
+        // Reset vecchi concetti e area Schema
         conceptsList.innerHTML = '';
+        resetSchemaArea();
 
         data.concepts.forEach((concept, index) => {
             const card = document.createElement('div');
@@ -349,12 +364,75 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const appendChatMessage = (text, senderType) => {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `chat-bubble ${senderType}-bubble animate-in`;
-        msgDiv.textContent = text;
-        chatHistory.appendChild(msgDiv);
-        chatHistory.scrollTop = chatHistory.scrollHeight; // Autoscroll al nuovo msg
-    };
+    // --- EVENT LISTENER AZIONI: PDF ED SCHEMI ---
+    downloadPdfBtn?.addEventListener('click', () => {
+        const title = currentBookContext?.title || 'Sintesi-Libro';
+        const sanitizedTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+        // Aggiungiamo classe per pulire il layout durante la foto
+        resultsArea.classList.add('pdf-export-mode');
+
+        const opt = {
+            margin: 10,
+            filename: `${sanitizedTitle}_sintesi.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true }, // useCORS cattura l'immagine di copertina esterna
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(resultsArea).save().then(() => {
+            // Rimuoviamo la classe al termine del download
+            resultsArea.classList.remove('pdf-export-mode');
+        });
+    });
+
+    generateSchemaBtn?.addEventListener('click', async () => {
+        if (!currentBookContext) return;
+
+        generateSchemaBtn.disabled = true;
+        schemaSpinner.classList.remove('hidden');
+        generateSchemaBtn.querySelector('span').textContent = '...';
+
+        try {
+            const response = await fetch('/.netlify/functions/get-schema', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    bookTitle: currentBookContext.title,
+                    author: currentBookContext.author
+                })
+            });
+
+            const replyData = await response.json();
+
+            if (!response.ok) {
+                throw new Error("Errore Generazione Schema");
+            }
+
+            // Convertiamo basic Markdown in HTML elementare
+            let formattedHtml = replyData.schema
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+                .replace(/\*(.*)\*/gim, '<em>$1</em>');
+
+            // Handle lists
+            formattedHtml = formattedHtml.replace(/^\* (.*$)/gim, '<ul><li>$1</li></ul>');
+            formattedHtml = formattedHtml.replace(/<\/ul>\n<ul>/gim, '');
+
+            schemaContent.innerHTML = formattedHtml;
+            schemaArea.classList.remove('hidden');
+
+            // Nascondiamo il bottone dopo averlo generato una volta per questo libro
+            generateSchemaBtn.querySelector('span').textContent = 'Fatto!';
+            schemaSpinner.classList.add('hidden');
+        } catch (err) {
+            console.error("Errore Schema", err);
+            generateSchemaBtn.disabled = false;
+            schemaSpinner.classList.add('hidden');
+            generateSchemaBtn.querySelector('span').textContent = 'Riprova';
+        }
+    });
 
 });

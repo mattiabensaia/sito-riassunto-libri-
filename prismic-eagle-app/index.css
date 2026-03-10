@@ -503,6 +503,87 @@ input::placeholder {
   color: #fff;
 }
 
+/* --- Action Toolbar --- */
+.action-toolbar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.btn-secondary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: var(--transition-normal);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* --- Schema Area --- */
+.schema-area {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  animation: slideDown 0.4s ease-out;
+}
+
+.schema-header h3 {
+  color: var(--accent-secondary);
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.schema-content {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 1rem;
+}
+
+.schema-content ul {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.schema-content li {
+  margin-bottom: 0.5rem;
+}
+
+.schema-content strong {
+  color: var(--text-primary);
+}
+
+.schema-content h1,
+.schema-content h2,
+.schema-content h3 {
+  color: var(--text-primary);
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
 /* Titolo Sezioni Intermedie */
 .section-title {
   display: flex;
@@ -833,6 +914,53 @@ input::placeholder {
     width: 160px;
     margin: 0 auto;
   }
+}
+
+/* Layout per Esportazione PDF (Usato da html2pdf) */
+.pdf-export-mode {
+  background: #fff !important;
+  color: #000 !important;
+  padding: 20px !important;
+}
+
+.pdf-export-mode * {
+  color: #000 !important;
+  border-color: #ddd !important;
+}
+
+.pdf-export-mode .no-print,
+.pdf-export-mode .concept-actions,
+.pdf-export-mode .action-toolbar,
+.pdf-export-mode .chat-section {
+  display: none !important;
+}
+
+.pdf-export-mode .book-hero-card,
+.pdf-export-mode .concept-card,
+.pdf-export-mode .schema-area {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  border: 1px solid #ccc !important;
+  color: #000 !important;
+}
+
+.pdf-export-mode .book-summary-box p,
+.pdf-export-mode .book-characters-box li,
+.pdf-export-mode .schema-content {
+  color: #333 !important;
+}
+
+.pdf-export-mode .accent-text,
+.pdf-export-mode .book-info-header .book-meta,
+.pdf-export-mode .schema-header h3 {
+  color: #4f46e5 !important;
+}
+
+.pdf-export-mode .concept-number {
+  background: rgba(99, 102, 241, 0.1) !important;
+  box-shadow: none !important;
 }
 
 /* History Drawer Overlay & Modal */
