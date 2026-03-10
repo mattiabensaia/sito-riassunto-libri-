@@ -33,15 +33,25 @@ export const handler = async (event, context) => {
 
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
 
-        const systemPrompt = `Sei un professore universitario esperto in tecniche di memorizzazione visiva e mappe mentali.
-Il tuo compito è creare una MAPPA CONCETTUALE testuale perfetta per afferrare la struttura del libro "${bookTitle}" scritto da ${author || 'un autore'}.
+        const systemPrompt = `Sei un esperto creatore di mappe concettuali.
+Il tuo compito è creare i dati per disegnare una mappa mentale ad albero del libro "${bookTitle}" scritto da ${author || 'Sconosciuto'}.
 
-L'output deve essere un riassunto a elenco gerarchico puntato ben strutturato usando ESCLUSIVAMENTE markdown semplice:
-- Usa i titoli "##" per dividere i rami principali della mappa (es: "1. Tema Centrale", "2. Evoluzione dei Personaggi", "3. Conflitto Principale").
-- Usa il bullet point "*" per elencare i sotto-nodi o concetti collegati sotto ogni ramo.
-- Usa il grassetto "**" per evidenziare i concetti chiave veri e propri.
-
-Non dilungarti in discorsi lunghi. Sii iper-sintetico, schematico e visivo (simula una mappa ad albero testuale), per facilitare la memorizzazione a colpo d'occhio.`;
+DEVI RISPONDERE ESCLUSIVAMENTE CON UN OGGETTO JSON. Non inserire markdown, backticks o altro testo fuori dal JSON.
+La struttura del JSON deve essere ESATTAMENTE questa:
+{
+  "root": "Titolo Breve Libro",
+  "branches": [
+    {
+      "title": "Tema o Capitolo 1",
+      "nodes": ["Concetto chiave 1", "Concetto 2"]
+    },
+    {
+      "title": "Tema 2",
+      "nodes": ["Dettaglio 1", "Dettaglio 2"]
+    }
+  ]
+}
+Assicurati di creare massimo 4 branches, e per ogni branch massimo 3 nodes sintetici.`;
 
         const requestBody = {
             contents: [{ parts: [{ text: systemPrompt }] }],

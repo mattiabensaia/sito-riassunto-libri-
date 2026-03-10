@@ -38,13 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookCharactersList = document.getElementById('bookCharactersList');
     const conceptsList = document.getElementById('conceptsList');
 
-    // Area Azioni (Mappa Concettuale in PDF Nascosta)
+    // Area Azioni (Mappa Concettuale V2)
     const generateSchemaBtn = document.getElementById('generateSchemaBtn');
     const schemaSpinner = document.getElementById('schemaSpinner');
-    const printArea = document.getElementById('printArea');
-    const printTitle = document.getElementById('printTitle');
-    const printAuthor = document.getElementById('printAuthor');
-    const printContent = document.getElementById('printContent');
 
     // Area Chat AI
     const chatForm = document.getElementById('chatForm');
@@ -172,11 +168,8 @@ document.addEventListener('DOMContentLoaded', () => {
         searchButton.disabled = false;
     };
 
-    const resetPrintArea = () => {
-        printContent.innerHTML = '';
-        generateSchemaBtn.disabled = false;
-        generateSchemaBtn.querySelector('span').textContent = 'Mappa Concettuale';
-    };
+    generateSchemaBtn.disabled = false;
+    generateSchemaBtn.querySelector('span').textContent = 'Mappa Concettuale';
 
     const fetchCoverImage = async (title, author) => {
         try {
@@ -242,9 +235,10 @@ document.addEventListener('DOMContentLoaded', () => {
             fetchCoverImage(data.title, data.author);
         }
 
-        // Reset vecchi concetti e area Schema
+        // Reset vecchi concetti e logiche Mappa
         conceptsList.innerHTML = '';
-        resetPrintArea();
+        generateSchemaBtn.disabled = false;
+        generateSchemaBtn.querySelector('span').textContent = 'Mappa Concettuale';
 
         data.concepts.forEach((concept, index) => {
             const card = document.createElement('div');
@@ -403,36 +397,137 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error("Errore Generazione Mappa Concettuale");
             }
 
-            // Convertiamo basic Markdown in HTML elementare
-            let formattedHtml = replyData.schema
-                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-                .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-                .replace(/\*(.*)\*/gim, '<em>$1</em>');
+            // Dalla stringa generata estraiamo il JSON vero e proprio
+            let rawJson = replyData.schema;
+            // Pulisce blocchi markdown tipo ```json ... ``` se presenti
+            if (rawJson.startsWith('```json')) {
+                rawJson = rawJson.replace(/^```json/g, '').replace(/```$/g, '').trim();
+            } else if (rawJson.startsWith('```')) {
+                rawJson = rawJson.replace(/^```/g, '').replace(/```$/g, '').trim();
+            }
 
-            // Handle lists
-            formattedHtml = formattedHtml.replace(/^\* (.*$)/gim, '<ul><li style="margin-bottom: 6px;">$1</li></ul>');
-            formattedHtml = formattedHtml.replace(/<\/ul>\n<ul>/gim, '');
+            const mapData = JSON.parse(rawJson);
 
-            // Popola il div bianco formale strutturato
-            printTitle.textContent = currentBookContext.title;
-            printAuthor.textContent = currentBookContext.author || '';
-            printContent.innerHTML = formattedHtml;
+            generateSchemaBtn.querySelector('span').textContent = 'Disegno Grafica...';
 
-            // Diamo tempo al DOM di iniettare l'HTML prima di stampare
+            // --- ENGINE VETTORIALE CANVAS ---
+            const canvas = document.createElement('canvas');
+            canvas.width = 1920;
+            canvas.height = 1080;
+            const ctx = canvas.getContext('2d');
+
+            // Sfondo
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Font Utils
+            const drawText = (text, x, y, size, weight, color, align = 'left') => {
+                ctx.font = `${weight} ${size}px 'Inter', sans-serif`;
+                ctx.fillStyle = color;
+                ctx.textAlign = align;
+                ctx.fillText(text, x, y);
+            };
+
+            // Funzione Bolla con Testo "A-capo" grezzo
+            const drawBubble = (text, cx, cy, w, h, bgColor, textColor, radius = 12) => {
+                ctx.fillStyle = bgColor;
+                ctx.beginPath();
+                ctx.roundRect(cx - w / 2, cy - h / 2, w, h, radius);
+                ctx.fill();
+
+                // Ombretta leggerissima per look premium
+                ctx.shadowColor = 'rgba(0,0,0,0.1)';
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetY = 4;
+                ctx.fill();
+                ctx.shadowColor = 'transparent';
+
+                // Troncamento ultra grezzo se testo troppo lungo
+                let cleanText = text.length > 50 ? text.substring(0, 47) + '...' : text;
+                drawText(cleanText, cx, cy + 6, h * 0.25, '600', textColor, 'center');
+            };
+
+            // Traccia connessione Bezier
+            const drawConnection = (startX, startY, endX, endY) => {
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.bezierCurveTo(startX + 100, startY, endX - 100, endY, endX, endY);
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            };
+
+            // 1) HEADER Documento
+            drawText("MAPPA CONCETTUALE", 40, 60, 24, '700', '#64748b');
+            drawText(`Libro: ${currentBookContext.title}`, 40, 100, 32, '700', '#0f172a');
+            drawText(`Autore: ${currentBookContext.author || 'N/D'}`, 40, 140, 20, '400', '#475569');
+            drawText("Generato tramite Sintesi Libri AI", 40, canvas.height - 40, 16, '400', '#94a3b8');
+
+            // 2) Posizioni Logiche del Grafo
+            const rootX = 300;
+            const rootY = 540;
+
+            // ROOT NODE
+            drawBubble(mapData.root || 'Root', rootX, rootY, 350, 80, '#4f46e5', '#ffffff', 20);
+
+            // Disegna rami e foglie
+            if (mapData.branches && mapData.branches.length > 0) {
+                const totalBranches = mapData.branches.length;
+                const branchX = 850;
+
+                // Spaziamo in Y in base a quanti ce ne sono
+                const branchStartY = 1080 / (totalBranches + 1);
+
+                mapData.branches.forEach((branch, bIdx) => {
+                    const branchY = branchStartY * (bIdx + 1);
+
+                    // Linea Root -> Branch
+                    drawConnection(rootX + 175, rootY, branchX - 200, branchY);
+
+                    // Bolla Branch
+                    drawBubble(branch.title || 'Tema', branchX, branchY, 400, 70, '#6366f1', '#ffffff', 16);
+
+                    // Disegna Nodi Finali
+                    if (branch.nodes && branch.nodes.length > 0) {
+                        const totalNodes = branch.nodes.length;
+                        const nodeX = 1500;
+                        const subSpan = 180; // pixel fra nodi di questo branch
+
+                        // Centratura Y relativa al suo Branch
+                        const startNodeY = branchY - ((totalNodes - 1) * subSpan) / 2;
+
+                        branch.nodes.forEach((nodeStr, nIdx) => {
+                            const nodeY = startNodeY + (nIdx * subSpan);
+
+                            drawConnection(branchX + 200, branchY, nodeX - 250, nodeY);
+                            drawBubble(nodeStr, nodeX, nodeY, 500, 60, '#ffffff', '#1e293b', 12);
+
+                            // Aggiungo un bordino al node figlio perché è bianco su grigino
+                            ctx.strokeStyle = '#e2e8f0';
+                            ctx.lineWidth = 2;
+                            ctx.stroke();
+                        });
+                    }
+                });
+            }
+
+            generateSchemaBtn.querySelector('span').textContent = 'Creazione PDF in alta fedeltà...';
+
+            // --- ESPORTAZIONE JSPDF DIRETTA (No Stampa Nativa) ---
             setTimeout(() => {
-                // Rinominiamo solo temporaneamente il titolo pagina così che il file salvato da browser abbia un nome bello
-                const originalPageTitle = document.title;
+                const imgData = canvas.toDataURL('image/png');
+
+                const { jsPDF } = window.jspdf;
+                // A4 in Landscape = 297 x 210 mm
+                const pdf = new jsPDF('landscape', 'mm', 'a4');
+
+                // Aggiungiamo PNG occupando tutto A4
+                pdf.addImage(imgData, 'PNG', 0, 0, 297, 210);
+
                 const sanitizedTitle = (currentBookContext?.title || 'Libro').replace(/[^a-z0-9]/gi, '_').toLowerCase();
-                document.title = `${sanitizedTitle}_mappa_concettuale`;
+                pdf.save(`${sanitizedTitle}_diagramma.pdf`);
 
-                // Attiviamo stampa nativa
-                window.print();
-
-                // Ripristiniamo UI e titolo originale
-                document.title = originalPageTitle;
-                generateSchemaBtn.querySelector('span').textContent = 'Scarica di nuovo';
+                generateSchemaBtn.querySelector('span').textContent = 'Mappa Concettuale';
                 schemaSpinner.classList.add('hidden');
                 generateSchemaBtn.disabled = false;
             }, 500);

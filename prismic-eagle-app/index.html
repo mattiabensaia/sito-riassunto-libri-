@@ -15,6 +15,11 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="index.css?v=2">
+
+    <!-- jsPDF Library per File-Creation silenziosa -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+        integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 
 <body>
@@ -199,19 +204,7 @@
         </div>
     </div>
 
-    <!-- Template per Stampare il PDF (Invisibile sul sito, indipendente) -->
-    <div id="printArea" class="print-area">
-        <div class="print-header">
-            <h1 id="printTitle">Titolo Libro</h1>
-            <p id="printAuthor">Autore</p>
-        </div>
-        <div id="printContent" class="print-content">
-            <!-- Contenuto Schema in Markdown -->
-        </div>
-        <div class="print-footer">
-            Generato tramite Sintesi Libri AI
-        </div>
-    </div>
+    <!-- Il Canvas per il disegno logico della mappa verrà creato in memoria dinamicamente da app.js -->
 
     <script src="app.js"></script>
 </body>
