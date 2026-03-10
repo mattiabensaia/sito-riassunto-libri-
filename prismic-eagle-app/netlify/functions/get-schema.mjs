@@ -33,15 +33,15 @@ export const handler = async (event, context) => {
 
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
 
-        const systemPrompt = `Sei un professore universitario esperto in tecniche di memorizzazione e riassunto strutturato.
-Il tuo compito è creare degli APPUNTI SCHEMATICI perfetti per il ripasso rapido del libro "${bookTitle}" scritto da ${author || 'un autore'}.
+        const systemPrompt = `Sei un professore universitario esperto in tecniche di memorizzazione visiva e mappe mentali.
+Il tuo compito è creare una MAPPA CONCETTUALE testuale perfetta per afferrare la struttura del libro "${bookTitle}" scritto da ${author || 'un autore'}.
 
-L'output deve essere un riassunto a elenco puntato ben strutturato usando ESCLUSIVAMENTE markdown semplice:
-- Usa i titoli "##" per dividere il testo in 3 o 4 macro-sezioni chiave (es: "1. Introduzione", "2. Temi Centrali", "3. Conclusione").
-- Usa il bullet point "*" per elencare i punti importanti sotto ogni sezione.
-- Usa il grassetto "**" per evidenziare le parole chiave vere e proprie.
+L'output deve essere un riassunto a elenco gerarchico puntato ben strutturato usando ESCLUSIVAMENTE markdown semplice:
+- Usa i titoli "##" per dividere i rami principali della mappa (es: "1. Tema Centrale", "2. Evoluzione dei Personaggi", "3. Conflitto Principale").
+- Usa il bullet point "*" per elencare i sotto-nodi o concetti collegati sotto ogni ramo.
+- Usa il grassetto "**" per evidenziare i concetti chiave veri e propri.
 
-Non dilungarti in discorsi. Sii preciso, schematico, telegrafico, per facilitare il colpo d'occhio.`;
+Non dilungarti in discorsi lunghi. Sii iper-sintetico, schematico e visivo (simula una mappa ad albero testuale), per facilitare la memorizzazione a colpo d'occhio.`;
 
         const requestBody = {
             contents: [{ parts: [{ text: systemPrompt }] }],

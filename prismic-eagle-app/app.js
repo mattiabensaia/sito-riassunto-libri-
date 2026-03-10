@@ -38,8 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookCharactersList = document.getElementById('bookCharactersList');
     const conceptsList = document.getElementById('conceptsList');
 
-    // Area Azioni (PDF e Schema)
-    const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+    // Area Azioni (Mappa Concettuale)
     const generateSchemaBtn = document.getElementById('generateSchemaBtn');
     const schemaSpinner = document.getElementById('schemaSpinner');
     const schemaArea = document.getElementById('schemaArea');
@@ -175,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
         schemaArea.classList.add('hidden');
         schemaContent.innerHTML = '';
         generateSchemaBtn.disabled = false;
-        generateSchemaBtn.querySelector('span').textContent = 'Genera Appunti';
+        generateSchemaBtn.querySelector('span').textContent = 'Mappa Concettuale';
     };
 
     const fetchCoverImage = async (title, author) => {
@@ -364,34 +363,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- EVENT LISTENER AZIONI: PDF ED SCHEMI ---
-    downloadPdfBtn?.addEventListener('click', () => {
-        const title = currentBookContext?.title || 'Sintesi-Libro';
-        const sanitizedTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-
-        // Aggiungiamo classe per pulire il layout durante la foto
-        resultsArea.classList.add('pdf-export-mode');
-
-        const opt = {
-            margin: 10,
-            filename: `${sanitizedTitle}_sintesi.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true }, // useCORS cattura l'immagine di copertina esterna
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        html2pdf().set(opt).from(resultsArea).save().then(() => {
-            // Rimuoviamo la classe al termine del download
-            resultsArea.classList.remove('pdf-export-mode');
-        });
-    });
-
+    // --- EVENT LISTENER AZIONI: MAPPA CONCETTUALE ED EXPORT AUTMOMATICO ---
     generateSchemaBtn?.addEventListener('click', async () => {
         if (!currentBookContext) return;
 
         generateSchemaBtn.disabled = true;
         schemaSpinner.classList.remove('hidden');
-        generateSchemaBtn.querySelector('span').textContent = '...';
+        generateSchemaBtn.querySelector('span').textContent = 'Creazione in corso...';
 
         try {
             const response = await fetch('/.netlify/functions/get-schema', {
@@ -406,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const replyData = await response.json();
 
             if (!response.ok) {
-                throw new Error("Errore Generazione Schema");
+                throw new Error("Errore Generazione Mappa Concettuale");
             }
 
             // Convertiamo basic Markdown in HTML elementare
@@ -424,11 +402,33 @@ document.addEventListener('DOMContentLoaded', () => {
             schemaContent.innerHTML = formattedHtml;
             schemaArea.classList.remove('hidden');
 
-            // Nascondiamo il bottone dopo averlo generato una volta per questo libro
-            generateSchemaBtn.querySelector('span').textContent = 'Fatto!';
-            schemaSpinner.classList.add('hidden');
+            generateSchemaBtn.querySelector('span').textContent = 'Preparazione PDF...';
+
+            // Diamo tempo al DOM di renderizzare la mappa concettuale
+            setTimeout(() => {
+                const title = currentBookContext?.title || 'Libro';
+                const sanitizedTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+                resultsArea.classList.add('pdf-export-mode');
+
+                const opt = {
+                    margin: 10,
+                    filename: `${sanitizedTitle}_mappa_concettuale.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                html2pdf().set(opt).from(resultsArea).save().then(() => {
+                    resultsArea.classList.remove('pdf-export-mode');
+                    generateSchemaBtn.querySelector('span').textContent = 'Scarica di nuovo';
+                    schemaSpinner.classList.add('hidden');
+                    generateSchemaBtn.disabled = false;
+                });
+            }, 500); // 500ms di delay per il rendering visivo
+
         } catch (err) {
-            console.error("Errore Schema", err);
+            console.error("Errore Mappa Concettuale", err);
             generateSchemaBtn.disabled = false;
             schemaSpinner.classList.add('hidden');
             generateSchemaBtn.querySelector('span').textContent = 'Riprova';
