@@ -36,22 +36,34 @@ export const handler = async (event, context) => {
         const systemPrompt = `Sei un esperto creatore di mappe concettuali.
 Il tuo compito è creare i dati per disegnare una mappa mentale ad albero del libro "${bookTitle}" scritto da ${author || 'Sconosciuto'}.
 
-DEVI RISPONDERE ESCLUSIVAMENTE CON UN OGGETTO JSON. Non inserire markdown, backticks o altro testo fuori dal JSON.
-La struttura del JSON deve essere ESATTAMENTE questa:
+DEVI RISPONDERE ESCLUSIVAMENTE CON UN OGGETTO JSON. Non inserire markdown, backticks o altro test fuori dal JSON.
+Il JSON deve avere ESATTAMENTE questa struttura, con ESATTAMENTE questi 5 rami fissi per avere il miglior riassunto schematico possibile, non aggiungere "astrazioni filosofiche":
 {
   "root": "Titolo Breve Libro",
   "branches": [
     {
-      "title": "Tema o Capitolo 1",
-      "nodes": ["Concetto chiave 1", "Concetto 2"]
+      "title": "Personaggi Principali",
+      "nodes": ["Protagonista (ruolo)", "Antagonista (ruolo)", "Personaggio Modello", "Aiutante"]
     },
     {
-      "title": "Tema 2",
-      "nodes": ["Dettaglio 1", "Dettaglio 2"]
+      "title": "Sintesi della Trama",
+      "nodes": ["L'inizio", "Lo sviluppo", "Il colpo di scena", "La conclusione"]
+    },
+    {
+      "title": "Tematiche Chiave",
+      "nodes": ["Tema forte 1", "Tema 2", "Tema 3"]
+    },
+    {
+      "title": "Contesto e Ambientazione",
+      "nodes": ["Epoca storica", "Luogo principale", "Atmosfera generale"]
+    },
+    {
+      "title": "Insegnamento e Morale",
+      "nodes": ["Cosa si impara 1", "Riflessione 2", "Messaggio finale"]
     }
   ]
 }
-Assicurati di creare massimo 5 branches, e per ogni branch massimo 4 nodes super-sintetici.`;
+Ogni array "nodes" deve avere al massimo 4 concetti iper-sintetici legati al libro specifico.`;
 
         const requestBody = {
             contents: [{ parts: [{ text: systemPrompt }] }],
