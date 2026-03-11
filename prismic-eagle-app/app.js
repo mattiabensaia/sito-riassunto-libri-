@@ -412,9 +412,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // --- ENGINE VETTORIALE CANVAS ---
             const canvas = document.createElement('canvas');
-            // Aumentata risoluzione canvas per contenere fino a 5 rami x 4 foglie senza sovrapposizioni
-            canvas.width = 2400;
-            canvas.height = 1600;
+            // Risoluzione Ultra-Wide riproporzionata per calzare magicamente il layout di jsPDF senza crop, e abbastanza alta da non far toccare i blocchi espansi dei rami.
+            canvas.width = 3400;
+            canvas.height = 2400;
             const ctx = canvas.getContext('2d');
 
             // Sfondo
@@ -441,68 +441,68 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (strokeColor) {
                     ctx.strokeStyle = strokeColor;
-                    ctx.lineWidth = 3;
+                    ctx.lineWidth = 4;
                     ctx.stroke();
                 }
 
                 // Ombra leggera premium
                 ctx.shadowColor = 'rgba(0,0,0,0.08)';
-                ctx.shadowBlur = 12;
-                ctx.shadowOffsetY = 4;
+                ctx.shadowBlur = 16;
+                ctx.shadowOffsetY = 6;
                 ctx.fill();
                 ctx.shadowColor = 'transparent';
 
                 // Troncamento se testo troppo lungo
-                let cleanText = text.length > 55 ? text.substring(0, 52) + '...' : text;
-                drawText(cleanText, cx, cy + 6, h * 0.25, '600', textColor, 'center');
+                let cleanText = text.length > 70 ? text.substring(0, 67) + '...' : text;
+                drawText(cleanText, cx, cy + 8, h * 0.28, '600', textColor, 'center');
             };
 
             // Traccia connessione Bezier
             const drawConnection = (startX, startY, endX, endY, color = '#cbd5e1') => {
                 ctx.beginPath();
                 ctx.moveTo(startX, startY);
-                ctx.bezierCurveTo(startX + 150, startY, endX - 150, endY, endX, endY);
+                ctx.bezierCurveTo(startX + 200, startY, endX - 200, endY, endX, endY);
                 ctx.strokeStyle = color;
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 4;
                 ctx.stroke();
             };
 
             // 1) HEADER Documento
-            drawText("MAPPA CONCETTUALE", 50, 80, 28, '700', '#64748b');
-            drawText(`Libro: ${currentBookContext.title}`, 50, 130, 42, '700', '#0f172a');
-            drawText(`Autore: ${currentBookContext.author || 'N/D'}`, 50, 180, 24, '400', '#475569');
-            drawText("Generato tramite Sintesi Libri AI", 50, canvas.height - 50, 18, '400', '#94a3b8');
+            drawText("MAPPA CONCETTUALE", 70, 100, 36, '700', '#64748b');
+            drawText(`Libro: ${currentBookContext.title}`, 70, 160, 54, '700', '#0f172a');
+            drawText(`Autore: ${currentBookContext.author || 'N/D'}`, 70, 220, 32, '400', '#475569');
+            drawText("Generato tramite Sintesi Libri AI", 70, canvas.height - 70, 24, '400', '#94a3b8');
 
             // 2) Posizioni Logiche del Grafo
-            const rootX = 350;
+            const rootX = 450;
             const rootY = canvas.height / 2; // Centraggio vert
 
             // ROOT NODE (Nero)
-            drawBubble(mapData.root || 'Root', rootX, rootY, 400, 90, '#1e293b', '#ffffff', 20);
+            drawBubble(mapData.root || 'Root', rootX, rootY, 550, 120, '#1e293b', '#ffffff', 24);
 
             // Disegna rami e foglie
             if (mapData.branches && mapData.branches.length > 0) {
                 const totalBranches = mapData.branches.length;
-                const branchX = 1000;
+                const branchX = 1400;
 
-                // Spazio Y macro-ramo
-                const branchSpanY = (canvas.height - 150) / totalBranches;
+                // Spazio Y macro-ramo generosissimo per non fare accavallare i 4 concetti finali
+                const branchSpanY = (canvas.height - 200) / totalBranches;
 
                 mapData.branches.forEach((branch, bIdx) => {
-                    const branchY = 75 + (branchSpanY * bIdx) + (branchSpanY / 2);
+                    const branchY = 100 + (branchSpanY * bIdx) + (branchSpanY / 2);
                     const bColor = branchColors[bIdx % branchColors.length];
 
                     // Linea Root -> Branch
-                    drawConnection(rootX + 200, rootY, branchX - 250, branchY, '#e2e8f0');
+                    drawConnection(rootX + 275, rootY, branchX - 350, branchY, '#e2e8f0');
 
                     // Bolla Branch Colorata
-                    drawBubble(branch.title || 'Tema', branchX, branchY, 450, 80, bColor, '#ffffff', 16);
+                    drawBubble(branch.title || 'Tema', branchX, branchY, 600, 100, bColor, '#ffffff', 20);
 
                     // Disegna Nodi Finali
                     if (branch.nodes && branch.nodes.length > 0) {
                         const totalNodes = branch.nodes.length;
-                        const nodeX = 1800;
-                        const nodeSpan = 100; // px di stacco tra fratelli
+                        const nodeX = 2500;
+                        const nodeSpan = 115; // px di stacco verticale immenso tra i fratelli per impedire overlappi testuali
 
                         // Centratura Y relativa al ramo
                         const startNodeY = branchY - ((totalNodes - 1) * nodeSpan) / 2;
@@ -511,8 +511,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             const nodeY = startNodeY + (nIdx * nodeSpan);
 
                             // Linea semi-trasparente col colore del ramo + bolla bordata
-                            drawConnection(branchX + 225, branchY, nodeX - 300, nodeY, bColor + '60');
-                            drawBubble(nodeStr, nodeX, nodeY, 600, 65, '#ffffff', '#0f172a', 12, bColor);
+                            drawConnection(branchX + 300, branchY, nodeX - 450, nodeY, bColor + '60');
+                            drawBubble(nodeStr, nodeX, nodeY, 800, 85, '#ffffff', '#0f172a', 14, bColor);
                         });
                     }
                 });
