@@ -1,19 +1,25 @@
 :root {
-  /* Color Palette - Premium Dark Theme */
-  --bg-primary: #0a0a0c;
-  --bg-secondary: #121216;
+  /* Tema Vetro Oscuro (Neo-Glassmorphism) */
+  --bg-primary: #05050A;
+  /* Nero Inchiostro puro */
+  --bg-secondary: #0A0A12;
   --text-primary: #ffffff;
-  --text-secondary: #a1a1aa;
+  --text-secondary: #94A3B8;
 
-  --accent-primary: #6366f1;
-  /* Indigo */
-  --accent-secondary: #8b5cf6;
-  /* Violet */
+  --accent-primary: #06B6D4;
+  /* Ciano Neon */
+  --accent-secondary: #D946EF;
+  /* Fuchsia/Magenta */
   --accent-gradient: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  --accent-gradient-hover: linear-gradient(135deg, #0891B2 0%, #C026D3 100%);
+  /* Hover più scuro */
 
-  --surface-color: rgba(255, 255, 255, 0.03);
-  --border-color: rgba(255, 255, 255, 0.08);
-  --glass-bg: rgba(18, 18, 22, 0.6);
+  /* Glassmorphism settings */
+  --surface-color: rgba(255, 255, 255, 0.02);
+  --border-color: rgba(255, 255, 255, 0.06);
+  /* Bordo lievissimo */
+  --glass-bg: rgba(10, 10, 18, 0.45);
+  /* Box più trasparenti */
 
   --error: #ef4444;
 
@@ -106,9 +112,10 @@ body {
 .bg-glow {
   position: absolute;
   border-radius: 50%;
-  filter: blur(120px);
+  filter: blur(150px);
+  /* Blur ancora più diffuso per i colori neon */
   z-index: 0;
-  opacity: 0.4;
+  opacity: 0.35;
   pointer-events: none;
 }
 
@@ -243,12 +250,14 @@ h1 {
   display: flex;
   align-items: center;
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(24px);
+  /* Blur Aumentato per effetto vetro profondo */
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--border-color);
   border-radius: 99px;
   padding: 8px 8px 8px 24px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  /* Luce interna speculare */
   transition: var(--transition-normal);
 }
 
@@ -392,13 +401,18 @@ input::placeholder {
   grid-template-columns: 200px 1fr;
   gap: 2rem;
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(24px);
+  /* Blur profondo tipico glassmorphism */
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--border-color);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  /* Luce superiore tagliente */
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  /* Luce laterale */
   border-radius: var(--border-radius-lg);
   padding: 2rem;
   margin-bottom: 2rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 2px 20px rgba(255, 255, 255, 0.02);
 }
 
 .book-cover-wrapper {
@@ -409,8 +423,9 @@ input::placeholder {
   justify-content: center;
   border-radius: var(--border-radius-md);
   overflow: hidden;
-  box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
-  background: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+  /* Ombra copertina più scura */
+  background: rgba(0, 0, 0, 0.4);
 }
 
 .book-cover {
@@ -617,12 +632,15 @@ input::placeholder {
 /* --- Chat Section --- */
 .chat-section {
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--border-color);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--border-radius-lg);
   padding: 2rem;
   margin-top: 3rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 2px 20px rgba(255, 255, 255, 0.02);
 }
 
 .chat-header {
@@ -709,9 +727,13 @@ input::placeholder {
 /* Concept Card */
 .concept-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--border-color);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  /* Riflesso tipico del vetro */
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  /* Riflesso tipico del vetro */
   border-radius: var(--border-radius-md);
   padding: 2rem;
   transition: var(--transition-normal);
@@ -719,6 +741,7 @@ input::placeholder {
   overflow: hidden;
   opacity: 0;
   transform: translateY(20px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 .concept-card.animate-in {
